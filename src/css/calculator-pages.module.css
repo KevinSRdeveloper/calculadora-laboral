@@ -1,0 +1,119 @@
+*{
+    padding: 0;
+    margin: 0;
+    font-family: Arial, Helvetica, sans-serif;
+}
+
+.containerCalculator{
+    max-width: 1440px;
+    width: 100%;
+    height: 100vh;
+    margin: 0 auto;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-content: space-evenly;
+   
+}
+
+.containerArticle{
+    width: 90%;
+    height: 15vh;
+    margin: 0 auto;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    background-color: rgb(255, 255, 255);
+}
+
+.containerArticle h1{
+    color: #204466;
+    letter-spacing: 2px;
+}
+
+.containerArticleImg{
+    width: 90%;
+    height: 40vh;
+    margin: 0 auto;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    background-color: rgb(255, 255, 255);
+}
+
+.containerFigure{
+    width: 100%;
+    height: 100%;
+}
+.containerFigure{
+    width: 100%;
+    height: 100%;
+}
+
+.containerFigure img{
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+    object-position: 50% 50%;
+}
+
+.containerArticle p{
+    text-align: center;
+
+}
+
+.containerButton{
+    width: 90%;
+    height: auto;
+    margin: 0 auto;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    background-color: rgb(255, 255, 255);
+
+}
+.containerButton button{
+    width: 50%;
+    height: 30px;
+    color: #fff;
+    border-radius: 12px;
+    border: none;
+    background-color: #008000;
+    outline: none;
+    cursor: pointer;
+}
+
+/**/
+.sectionCalculadora{
+    max-width: 1440px;
+    width: 100%;
+    height: 100vh;
+    margin: 0 auto;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-content: space-evenly;
+    background-color: #204466;
+
+}
+
+.articleCalculadora{
+   width: 100%;
+   height: 100px;
+   display: flex;
+   flex-direction: column;
+   justify-content: center;
+   background-color: #fff;
+   border-bottom: 1px #2f2f2f solid; 
+}
+
+.articleCalculadora h4{
+    letter-spacing: 1px;
+    color: #204466;
+}
+
+
+
