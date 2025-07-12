@@ -1,10 +1,13 @@
 import React from "react";
+import { useNavigate } from "react-router-dom";
 import  styles from '../css/calculator-pages.module.css';
 import logoImg from '../image/logo.png'; 
 
 
 const CalculatorPage = () => {
-  console.log(styles);
+
+  const navigate = useNavigate();
+ 
     return(
       <>
         <section className={styles.containerCalculator}>
@@ -32,7 +35,7 @@ const CalculatorPage = () => {
               <a href="mailto:kevindevelopersr@outlook.com">kevindevelopersr@outlook.com</a>
           </article>
            <article className={styles.containerButton}>
-            <button className="">Iniciar Calculadora</button>
+            <button className="" onClick={() => navigate('/calculadora')}>Iniciar Calculadora</button>
           </article>
          
           
