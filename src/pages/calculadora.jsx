@@ -1,125 +1,255 @@
 import { useEffect, useState } from 'react';
 import  styles from '../css/calculator-pages.module.css';
 import logoImg from '../image/logo.png'; 
+import logoCalculador from '../image/imageCalculador.png'; 
 
 const CalculadoraLaboral = () => {
-    
-    const [fechaInicial, setFechaInicial] = useState('');
-    const [fechaFinal, setFechaFinal] = useState('');
-    
-    const [anio, setAnio] = useState(0);
-    const [meses, setMeses] = useState(0);
-    const [dia, setDia] = useState(0);
 
-    const obtenemosFechaInicial = (e) => {
-        setFechaInicial(e.target.value);
-    }
+    /** CREAMOS EL USE STATE PARA AGREGAR LOS CAMPOS DE FECHA DINAMICOS CUANDO SE REQUIERA */
+    const [rangosFechas, setRangosFechas] = useState([
+        {fechaExperienciaInicial:'', fechaFinalExperiencia:''}
+    ]);
 
-    const obtenemosFechaFinal = (e) => {
-        setFechaFinal(e.target.value);
-    }
+    const agregarNuevoRango = () => {
+        setRangosFechas([...rangosFechas,{fechaExperienciaInicial:'', fechaFinalExperiencia:''}]);
+    };
 
-    const calcularExperiencia = () => {
-        /** VARIABLES PARA HACER LA VALIDACION ENTRE FECHAS */
-        const fechaInicioExperiencia = new Date(fechaInicial);
-        const fechaFinalExperiencia = new Date(fechaFinal);
-        /** */
-        let aniosExperiencia = fechaFinalExperiencia.getFullYear() - fechaInicioExperiencia.getFullYear();
-        let mesesExperiencia = fechaFinalExperiencia.getMonth() - fechaInicioExperiencia.getMonth();
-        let diasExperiencia = fechaFinalExperiencia.getDate() - fechaInicioExperiencia.getDate();
+    const [totalExperiencia, setTotalExperiencia] = useState({
+        anios:  0,
+        meses:  0,
+        dias:   0
+    });
 
-        /** CONDICIONES SI PRESENTAMOS ALGUN ERROR O DATO FALTANTR */
-        if(!fechaInicial){
-            alert("Por Favor Ingrese la fecha Inicial");
-            return;
+    const handleFechaChange = (index, campo, valor) => {
+        const nuevosRangos = [...rangosFechas];
+        nuevosRangos[index][campo] = valor;
+        setRangosFechas(nuevosRangos);
+    };
+
+    const calcularDiferenciaFechas = (fechaExperienciaInicial, fechaFinalExperiencia ) => {
+        if (!fechaExperienciaInicial || !fechaFinalExperiencia) return { anio:0,  meses: 0, dias:0 };
+
+        const inicio = new Date(fechaExperienciaInicial);
+        const fin = new Date(fechaFinalExperiencia);
+
+        if(fin < inicio){
+            return { anio:0,  meses: 0, dias:0 };
         }
 
-        if(!fechaFinal){
-            alert("Por Favor Ingrese la fecha Final");
-            return;
+        let anios = fin.getFullYear() - inicio.getFullYear();
+        let meses = fin.getMonth() - inicio.getMonth();
+        let dias = fin.getDate() - inicio.getDate();
+
+        if(dias < 0 ){
+            meses--;
+            const ultimoDiaMesAnterior = new Date(
+                fin.getFullYear(),
+                fin.getMonth(),
+                0
+            ).getDate();
+            dias += ultimoDiaMesAnterior;
+
         }
 
-        if(fechaInicioExperiencia > fechaFinalExperiencia){
-            alert("La Fecha final no puede ser menor a la fecha inicial");
-            return;
+        if(meses < 0){
+            anios--;
+            meses += 12;
         }
 
-        if(diasExperiencia < 0){
-            mesesExperiencia -= 1;
-            const ultimoDiaMesAnterior = new Date(fechaFinalExperiencia.getFullYear(),fechaFinalExperiencia.getMonth(),0).getDate();
-            diasExperiencia += ultimoDiaMesAnterior;
-            console.log("DIAS", diasExperiencia);
-        }
+        return {anios, meses, dias};
 
-        if(mesesExperiencia < 0 ){
-            aniosExperiencia -= 1;
-            mesesExperiencia += 12;
-        }
 
-        setAnio(aniosExperiencia);
-        setMeses(mesesExperiencia);
-        setDia(diasExperiencia);
+    };
 
-         console.log(`Años ${aniosExperiencia},Meses ${mesesExperiencia}, Dias ${diasExperiencia} FECHA FINAL`);
+    const calcularExperienciaTotal = () => {
+
+        const hayFechasIncompletas = rangosFechas.some(
+        rango => !rango.fechaExperienciaInicial || !rango.fechaFinalExperiencia
         
+        );
+
+        if (hayFechasIncompletas) {
+            alert("Por favor, coloque todas las fechas antes de calcular.");
+            return;
+        }
+       
+        let totalAnios = 0,
+            totalMeses = 0,
+            totalDias = 0;
+
+        rangosFechas.forEach(rango => {
+            const {anios,meses,dias} = calcularDiferenciaFechas(
+                rango.fechaExperienciaInicial,
+                rango.fechaFinalExperiencia
+            );
+
+            totalAnios += anios;
+            totalMeses += meses;
+            totalDias += dias;
+
+        });
+
+        totalMeses += Math.floor(totalDias / 30);
+        totalDias = totalDias % 30;
+
+        totalAnios += Math.floor(totalMeses / 12);
+        totalMeses = totalMeses % 12;
+
+        setTotalExperiencia({
+            anios:totalAnios,
+            meses: totalMeses,
+            dias: totalDias
+        });
+
     }
-   
+
+    /** BOTON BARRA DE NAVEGACION */
+    
+    const [esVisible, setEsVisible] = useState(true);
+
+    const mostrarBarra = () => {
+            setEsVisible(prev => !prev);
+        };
+
+    /** LIMPIAR CAMPOS */
+    const limpiarFechas = () => {
+    // Reinicia los rangos a solo uno vacío
+    setRangosFechas([{ fechaExperienciaInicial: '', fechaFinalExperiencia: '' }]);
+
+    // Reinicia el total a cero
+    setTotalExperiencia({
+        anios: 0,
+        meses: 0,
+        dias: 0
+    });
+};
+
+
+
     return(
-        <section className={styles.sectionCalculadora}>
-            <article className={styles.articleCalculadora}>
-                <h1>CALCULADORA</h1>
-                <h4>Experiencia Laboral</h4>
-            </article>
+        <>
 
-             <article className={styles.articleFecha}>
-                <div className={styles.divFechaInicial}>
-                    <label htmlFor="">Fecha Inicial</label>
-                    <input 
-                        type="date" 
-                        name="" 
-                        id=""
-                        value={fechaInicial}    
-                        onChange={obtenemosFechaInicial}  
-                    />
-                </div>
-
-                <div className={styles.divFechaFinal}>
-                    <label htmlFor="">Fecha Final</label>
-                    <input 
-                        type="date" 
-                        name="" 
-                        id=""
-                        value={fechaFinal}
-                        onChange={obtenemosFechaFinal}     
-                    />
-                </div>
-
-            </article>
-           
-           
-            <div className={styles.divBotonesCalculadora}>
-                <button 
-                    className={styles.buttonCalcularFecha} 
-                    onClick={calcularExperiencia}>Calcular Experiencia</button>
+            <section className={styles.sectionCalculadora}>
+                <span className={styles.decoracionBarraLateral}></span>
+                <span className={styles.textDecoracion}>
+                    <h4>Kevin David Zambrano Galvis</h4>
+                    <h5>Desarrollador de Software</h5>
+                    <p>Me gusta transformar ideas en soluciones útiles y sencillas.</p>
+                    <p>Bogotá D.C. | 📱 301 530 4944</p>
+                    <p>📧 kevindavidtt@gmail.com</p>
+                    
+                </span>
                 
-                <button className={styles.buttonAgregarFecha}>Agregar Fecha</button>
-            </div>
-            <div className={styles.divTextoCalculadora}>
-                <div className="textAnios">
-                    <h3>Años</h3>
-                    <h2>{anio}</h2>
-                </div>
-                <div className="textMeses">
-                    <h3>Meses</h3>
-                    <h2>{meses}</h2>
-                </div>
-                <div className="textDias">
-                    <h3>Dias</h3>
-                    <h2>{dia}</h2>
+                <article className={styles.articleCalculadora}>
+                    <div className={styles.textTitleCalculadora}>
+                        <h1>CALCULADORA</h1>
+                        <h4>Experiencia Laboral</h4>
+                    </div>
+                   
+                    <div className={styles.containerResultados}>
+                        <h2>Total Experiencia</h2>
+                        <div className={styles.titulosResultados}>
+                            <h2>Años</h2>
+                            <h2>Meses</h2>
+                            <h2>Dia</h2>
+                        </div>
+
+                        <div className={styles.aniosResultados}>
+                            <h2>{totalExperiencia.anios}</h2>
+                            <h2>{totalExperiencia.meses}</h2>
+                            <h2>{totalExperiencia.dias}</h2>
+                        </div>
+
+                    </div>
+                </article>
+
+                {
+                    rangosFechas.map((rango,index) => (
+                        <article key={index} className={styles.articleFecha}>
+                        
+                            <div className={styles.containerDate}>
+                                <div className={styles.divFechaInicial}>
+                                    <label htmlFor={`fechaExperienciaInicial-${index}`}>Fecha Inicial</label> 
+                                    <input 
+                                        type="date" 
+                                        name="" 
+                                        id={`fechaExperienciaInicial-${index}`}
+                                        value={rango.fechaExperienciaInicial}
+                                        onChange={(e) => handleFechaChange(index,'fechaExperienciaInicial', e.target.value)}
+                                        className={styles.inputDateStart}
+                                        placeholder='dd/mm/aaaa'
+                                    /> 
+                                </div>
+
+                                <div className={styles.divFechaInicial}>
+                                    <label htmlFor="">Fecha Final</label> 
+                                    <input 
+                                        type="date"
+                                        id={`fechaFinalExperiencia-${index}`}
+                                        value={rango.fechaFinalExperiencia}
+                                        onChange={(e) => handleFechaChange(index,'fechaFinalExperiencia', e.target.value)}
+                                        className={styles.inputDateStart}
+                                    
+                                    />  
+                                </div>
+
+                            </div>
+                            
+                        </article>
+                    ))}
+                
+            
+            
+                <div className={styles.divBotonesCalculadora}>
+                    <div className={styles.botones}>
+                        <button 
+                        className={styles.buttonCalcularFecha} 
+                        onClick={calcularExperienciaTotal} >Calcular Experiencia
+                        </button>
+                    
+                        <button className={styles.buttonAgregarFecha} 
+                                onClick={agregarNuevoRango} >Agregar Fecha
+                        </button>
+                    
+                        <button className={styles.buttonLimpiarFecha} 
+                                onClick={limpiarFechas} >Limpiar
+                        </button>
+
+                    </div>
+                   
                 </div>
 
-            </div>
-        </section>
+                <div className={`${styles.menuCalculadora} ${!esVisible ? styles.menuCalculadoraHidden: ""}`}></div>
+
+                    <div className={`${styles.containerMenu} ${!esVisible ? styles.containerMenuHidden: ""}`}>
+                           <span className={styles.buttonMenu} onClick={mostrarBarra}>
+                                <i className={`bi ${esVisible ? "bi-caret-down-fill" : "bi-caret-up-fill "}`}></i>
+                           </span>
+                        <div className={styles.textMenu}>
+                            <h3>Calculadora Experiencia Laboral</h3>
+                        </div>
+                        <div className={styles.parrafoMenu}>
+                            <h4>
+                                Es una calculadora sencilla que ayuda a sumar y organizar los tiempos de experiencia laboral. Solo ingresas las fechas de inicio y fin de cada trabajo, y al final te muestra el total acumulado en años, meses y días de forma clara y rápida.
+                            </h4>
+                        </div>
+                        <div className={styles.figureMenu}>
+                            <figure className={styles.figureImg}>
+                                <img src={logoCalculador} alt="logo calculadora" />
+                            </figure>
+                        </div>
+
+                        <div className={styles.footerMenu}>
+                            <p>Desarrollada por Kevin David Zambrano Galvis</p>
+                            <p>📧 kevindavidtt@gmail.com | 📱 +57 301 530 4944</p>
+                        </div>
+                        
+                    </div>
+
+               
+            </section>
+
+        </>
     );
 }
 
